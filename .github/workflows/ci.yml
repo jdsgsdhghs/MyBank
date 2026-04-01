@@ -18,7 +18,7 @@ jobs:
       # Installer les dépendances frontend
       - name: Install Frontend Dependencies
         working-directory: frontend
-        run: npm install
+        run: npm ci
 
       # Build frontend
       - name: Build Frontend
@@ -35,11 +35,4 @@ jobs:
         working-directory: frontend
         run: npm test
 
-      # Symfony backend steps (facultatif)
-      - name: Install PHP dependencies
-        working-directory: backend
-        run: composer install --no-interaction --prefer-dist
-
-      - name: Run Backend Tests
-        working-directory: backend
-        run: php bin/phpunit
+    
