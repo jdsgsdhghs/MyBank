@@ -1,49 +1,45 @@
-name: CI Pipeline - mybank
-
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-
+# .github/workflows/ci.yml
 jobs:
-  frontend:
+  build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: frontend
-
     steps:
-      - uses: actions/checkout@v4
+      # Checkout du code
+      - uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v4
+      # Setup Node pour le frontend
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: 'npm'  # active le cache uniquement pour npm
           cache-dependency-path: frontend/package-lock.json
 
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run build
-      - run: npm test -- --coverage
+      # Installer les dépendances frontend
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: npm install
 
-  backend:
-    runs-on: ubuntu-latest
+      # Build frontend
+      - name: Build Frontend
+        working-directory: frontend
+        run: npm run build
 
-    defaults:
-      run:
+      # Lint frontend
+      - name: Lint Frontend
+        working-directory: frontend
+        run: npm run lint
+
+      # Test frontend (si tu en as)
+      - name: Test Frontend
+        working-directory: frontend
+        run: npm test
+
+      # Symfony backend steps (facultatif)
+      - name: Install PHP dependencies
         working-directory: backend
+        run: composer install --no-interaction --prefer-dist
 
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
-
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run build
-      - run: npm test -- --coverage
+      - name: Run Backend Tests
+        working-directory: backend
+        run: php bin/phpunit
